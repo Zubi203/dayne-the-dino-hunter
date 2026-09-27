@@ -8,7 +8,7 @@ To contest these formidable foes, a huge arsenal of unique cards is available to
 This project was made for my portfolio with the goal to learn, study, and recreate the mechanics of Slay the Spire while also showcasing my proficiency in gameplay systems programming and the Godot Engine.
 
 ### Project Features
-- 50 unique player cards and 40 enemy exclusive cards, each inheriting from the same abstract class. This makes for a very scalable system where new cards can be added very easily without altering any existing code
+- 50 unique player cards and 30+ enemy exclusive cards, each inheriting from the same abstract class. This makes for a very scalable system where new cards can be added very easily without altering any existing code
 - State-driven turn based combat system
 - Procedurally generated map layout featuring combat, rest, and treasure rooms, and a challenging boss battle at the very end
 - All cards are usable by both the player and the enemies, in accordance with the Liskov Substitution Principle.
