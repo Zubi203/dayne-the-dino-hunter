@@ -24,6 +24,7 @@ This project was made for my portfolio with the goal to learn, study, and recrea
 - A DeckManager Singleton that stores and updates the player's current deck and card reward pools, allowing this data to be globally accessible and persist between scenes
 - A MusicManager Singleton that features methods for smooth and easy transitions between different music tracks while also letting active music tracks persist between scenes
 - A SceneLoader Singleton that uses multithreading to load scenes in the background and displays a loading screen during the process
+- A PauseManager Singleton that tracks the number of active menus in an array. This allows for a very clean way to manage pause logic with menus that stack on top of each other
 
 ### Engine
 - This project was made using the Godot Engine
