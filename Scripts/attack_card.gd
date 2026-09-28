@@ -5,6 +5,8 @@ extends CardData
 
 func get_description(data: CastData) -> String:
 	var amount: int = damage
+	
+	#update description number based on player and enemy status effects
 	if data.caster:
 		var self_statuses: Array[ActiveEffect] = data.caster.status_effects
 		for status in self_statuses:
@@ -25,6 +27,8 @@ func cast (data : CastData):
 
 func get_preview_text(data: CastData = null) -> String:
 	var amount: int = damage
+	
+	#update number based on enemy and player status effects
 	if data.caster:
 		var self_statuses: Array[ActiveEffect] = data.caster.status_effects
 		for status in self_statuses:

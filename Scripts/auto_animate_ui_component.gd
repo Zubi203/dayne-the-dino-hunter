@@ -1,6 +1,7 @@
 class_name AutoAnimateUIComponent
 extends Control
 
+#dictates when the animation starts
 enum AnimStartTrigger{
 	MANUAL,
 	READY,
@@ -13,6 +14,7 @@ enum AnimType{
 	SLIDE_IN_RIGHT
 }
 
+#determines where the pivot point will be
 enum ScaleFrom{
 	CENTER,
 	TOP_LEFT,
@@ -39,6 +41,7 @@ func _ready() -> void:
 	if not target is Control:
 		return
 	
+	#prime UI element attributes for animation
 	match anim_type:
 		AnimType.SCALE:
 			target.scale = Vector2.ZERO
@@ -51,6 +54,7 @@ func _ready() -> void:
 		appear.call_deferred()
 	visibility_changed.connect(_on_visibility_changed)
 
+#set pivot point based on ScaleFrom property
 func set_pivot(control: Control, pivot: ScaleFrom):
 	match pivot:
 		ScaleFrom.CENTER:
@@ -81,7 +85,7 @@ func appear():
 	tween.set_ignore_time_scale(true)
 	tween.set_parallel(true)
 	
-
+	#tween based enter animation
 	if anim_type == AnimType.SCALE:
 		tween.tween_property(target, "scale", Vector2.ONE, duration).from(Vector2.ZERO)
 		tween.tween_property(target, "modulate:a", 1.0, 0.01)

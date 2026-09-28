@@ -7,6 +7,8 @@ var game_manager: GameManager:
 func get_description(data: CastData) -> String:
 	
 	var amount: int = block_amount
+	
+	#update description number based on the caster's status effects
 	if data.caster:
 		var self_statuses: Array[ActiveEffect] = data.caster.status_effects
 		for status in self_statuses:
@@ -18,7 +20,11 @@ func get_description(data: CastData) -> String:
 	return description
 
 func check_cast_condition() -> bool:
+	
+	#if the player's current block is zero, this card can be played
 	var player: Character = game_manager.player
 	if player.current_block <= 0:
 		return true
+	
+	#otherwise, this card cannot be played
 	return false

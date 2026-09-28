@@ -8,6 +8,8 @@ func apply_status(target: Character):
 		return
 	
 	target.add_status(self)
+	
+	#connect the character's DamageTaken signal when this buff is applied
 	if not target.DamageTaken.is_connected(_on_damage_taken):
 		target.DamageTaken.connect(_on_damage_taken)
 
@@ -18,8 +20,11 @@ func _on_damage_taken(target: Character):
 	if target == null:
 		return
 	
+	#apply buff whenever the DamageTaken signal is detected
 	target.add_status(buff_to_apply)
 
 func on_remove(target: Character):
+	
+	#disconnect the character's DamageTaken signal when this buff is removed
 	if target.DamageTaken.is_connected(_on_damage_taken):
 		target.DamageTaken.disconnect(_on_damage_taken)

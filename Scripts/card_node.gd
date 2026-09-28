@@ -42,13 +42,16 @@ func setup(data: CardData) -> void:
 	base_scale = scale
 	state = States.IDLE
 	
+	#card spawn animation
 	if tween and tween.is_running():
 		tween.kill()
 	tween = create_tween()
 	tween.set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO)
 	tween.tween_property(self, "scale", base_scale, 0.5).from(Vector2.ZERO)
 	
+	#update energy UI
 	game_manager.EnergyChanged.emit(game_manager.current_energy, game_manager.max_energy)
+	
 	return_to_idle_pos()
 	set_visuals()
 	audio_manager.play_random_pitch(draw_sound)
@@ -61,25 +64,37 @@ func _process(delta: float) -> void:
 	var lerp_speed: float = 20
 	var target_pos: Vector2 = idle_pos
 	
+	#follow mouse position while being dragged
 	if state == States.DRAGGING:
 		target_pos = get_global_mouse_position()
+		
+		#lerp for smooth movement
 		global_position = global_position.lerp(target_pos, delta * lerp_speed)
 	
 	if state == States.HOVER:
+		#display tooltips
 		tooltip_container.show()
 	else:
+		#hide tooltips
 		tooltip_container.hide()
-		
+	
+	#update card description numbers in real time to reflect statuses and modifiers
 	update_description()
 
 func cast():
+	#do not cast card if either the player or the enemy is not present in the scene
 	if game_manager.player == null or game_manager.enemy == null:
 		return
+	
+	#create an instance of the CastData sub class
 	var cast_data: CardData.CastData = CardData.CastData.new()
 	cast_data.caster = game_manager.player
 	cast_data.opponent = game_manager.enemy
+	
+	#play card
 	card_data.cast(cast_data)
 	
+	#emit particles
 	if cast_particles:
 		var particles: GPUParticles2D = cast_particles.instantiate()
 		get_tree().current_scene.add_child(particles)
@@ -109,27 +124,33 @@ func update_description():
 	
 	description_label.text = ""
 	
-
+	#create an instance of the CastData sub class
 	var data: CardData.CastData = CardData.CastData.new()
 	if game_manager.player:
 		data.caster = game_manager.player
 	if game_manager.enemy:
 		data.opponent = game_manager.enemy
 	
+
 	if not card_data.override_auto_generated_description:
+		#set script generated card description
 		description_label.text = card_data.get_description(data)
 	
 	if card_data.special_description and not card_data.override_auto_generated_description:
 		description_label.text += ","
 
 	if card_data.special_description:
+		#set manually written card description
 		description_label.text += "\n" + card_data.special_description
 
 func hover_enter():
 	audio_manager.play_random_pitch(hover_sound)
 	state = States.HOVER
+	
+	#increase z index while hovered to make it appear above other cards
 	z_index = 99
 	
+	#play hover animation
 	if tween and tween.is_running():
 		tween.kill()
 	tween = create_tween()
@@ -148,8 +169,11 @@ func hover_exit():
 func drag_enter():
 	audio_manager.play_random_pitch(drag_sound)
 	state = States.DRAGGING
+	
+	#increase z index when dragging to make it appear above other cards
 	z_index = 99
 	
+	#drag animation
 	if tween and tween.is_running():
 		tween.kill()
 	tween = create_tween()
@@ -162,6 +186,7 @@ func drag_exit():
 	
 
 func return_to_idle_pos():
+	#tween the card back to its default position, rotation, scale, and z index
 	if tween and tween.is_running():
 		tween.kill()
 	tween = create_tween()
@@ -172,6 +197,8 @@ func return_to_idle_pos():
 	tween.tween_property(self, "scale", base_scale, 0.2)
 
 func _on_energy_changed(current: int, _max: int):
+	
+	#make the energy cost label red if card cost is greater than the available energy
 	if card_data.cost > current:
 		cost_label.modulate = Color.RED
 	else:
@@ -184,7 +211,10 @@ func flash_red():
 
 func update_tooltips():
 	
+	#erase previous tooltips
 	clear_tooltips()
+	
+	#create new tooltips for all statuses and special effects associated with this card
 	
 	for status in card_data.tooltip_statuses:
 		set_status_tooltip(status)

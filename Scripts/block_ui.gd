@@ -10,6 +10,8 @@ func _ready() -> void:
 	character.BlockUpdated.connect(update_block_ui)
 	base_scale = scale
 	base_position = global_position
+	
+	#set pivot point to center
 	pivot_offset.x = size.x / 2
 	pivot_offset.y = size.y / 2
 
@@ -19,12 +21,15 @@ func update_block_ui():
 	if block_text == null:
 		return
 	
-	
+	#animate block icon if the character previously had zero block
 	if prev_block_value <= 0 and character.current_block > 0:
 		entry_animation()
 	
+	#animate block icon if the character's block has just expired
 	if prev_block_value > 0 and character.current_block <= 0:
 		exit_animation()
+	
+	#update block ui text
 	prev_block_value = character.current_block
 	block_text.text = str(character.current_block)
 

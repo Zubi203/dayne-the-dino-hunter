@@ -23,38 +23,52 @@ func cast (data : CastData):
 		return
 	
 	if damage > 0:
+		#deal damage
 		data.caster.attack(data.opponent, damage)
 		await data.caster.get_tree().create_timer(0.2).timeout
+		
 	if block > 0:
+		#gain block
 		data.caster.block(block)
 		await data.caster.get_tree().create_timer(0.2).timeout
+		
 	if heal > 0:
+		#heal
 		data.caster.heal(heal)
 		await data.caster.get_tree().create_timer(0.2).timeout
+		
 	if self_damage > 0:
+		#deal damage to caster
 		data.caster.take_damage(self_damage)
 		await data.caster.get_tree().create_timer(0.2).timeout
 	
 	if energy_gain > 0:
+		#gain energy
 		game_manager.current_energy += energy_gain
 		await data.caster.get_tree().create_timer(0.2).timeout
 
 	
 	await data.caster.get_tree().create_timer(0.2).timeout
+	
+	#apply status effects to opponent
 	for status in debuffs_to_apply:
 		status.apply_status(data.opponent)
 		await data.caster.get_tree().create_timer(0.4).timeout
 	
+	#apply status effects to self
 	for status in buffs_to_apply:
 		status.apply_status(data.caster)
 		await data.caster.get_tree().create_timer(0.4).timeout
 	
+	#draw cards
 	for i in cards_to_draw:
 		card_manager._deal_card()
 		await data.caster.get_tree().create_timer(0.2).timeout
 
 func get_description(data: CastData) -> String:
 	var description: String = ""
+	
+	# Update description numbers based on caster's and opponent's status effects
 	
 	if damage > 0:
 		var amount: int = damage
@@ -110,6 +124,9 @@ func get_description(data: CastData) -> String:
 	return description
 
 func get_preview_text(data: CastData = null) -> String:
+	
+	#Update preview description numbers based on caster's and opponent's status effects
+	
 	if damage > 0:
 		var amount: int = damage
 		if data.caster:

@@ -23,6 +23,8 @@ var base_scale: Vector2
 func _ready() -> void:
 	base_scale = scale
 	start_pos = position
+	
+	#connect button signals
 	pressed.connect(_on_pressed)
 	mouse_entered.connect(_mouse_entered)
 	mouse_exited.connect(_mouse_exited)
@@ -51,25 +53,34 @@ func set_visuals():
 	if type_label == null:
 		return
 	
+	#set card title text, cost text, and icon
 	name_label.text = card_data.name
 	cost_label.text = str(card_data.cost)
 	icon.texture = card_data.icon
 	type_label.text = CardData.CardType.find_key(card_data.type)
 	
+	#clear description text
 	description_label.text = ""
 	
+	#create an instance of the CastData sub class
 	var data: CardData.CastData = CardData.CastData.new()
 	data.caster = null
 	data.opponent = null
 	
+	
+	#set card description
+	
 	if not card_data.override_auto_generated_description:
+		#use script generated card description
 		description_label.text = card_data.get_description(data)
 	
-
 	if card_data.special_description:
+		#use manually entered card description
 		description_label.text += "\n" + card_data.special_description 
 
 func update_tooltips():
+	#create tooltip panels for each effect associated with the card
+	
 	for status in card_data.tooltip_statuses:
 		set_status_tooltip(status)
 	
@@ -83,6 +94,7 @@ func clear_tooltips():
 	if tooltip_container == null:
 		return
 	
+	#remove all tooltips
 	for child in tooltip_container.get_children():
 		child.queue_free()
 
@@ -93,8 +105,13 @@ func set_status_tooltip(status: StatusEffect):
 	if tooltip_scene == null:
 		return
 	
+	#create a new tooltip instance
 	var tooltip: StatusTooltip = tooltip_scene.instantiate()
+	
+	#add the tooltip to the tooltip container
 	tooltip_container.add_child(tooltip)
+	
+	#assign description and icon to it based on the status effect resource
 	tooltip.setup(status)
 
 func _on_pressed():
@@ -117,15 +134,21 @@ func select_animation():
 	tween.tween_property(self, "modulate:a", 0.0, 0.4)
 
 func _mouse_entered():
+	
+	#reveal tooltips when mouse is hovered over this button
 	if tooltip_container:
 		update_tooltips()
 		tooltip_container.show()
 
 func _mouse_exited():
+	
+	#clear and hide all tooltips when mouse is not hovered over this button
 	if tooltip_container:
 		clear_tooltips()
 		tooltip_container.hide()
 
 func _pressed() -> void:
+	
+	# hide all tooltips when this button is pressed
 	if tooltip_container:
 		tooltip_container.hide()

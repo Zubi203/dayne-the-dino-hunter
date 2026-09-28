@@ -23,9 +23,12 @@ func play_boss_soundtrack():
 
 
 func _on_visibility_changed() -> void:
+	
+	#start the intro animation when this node is made visible
 	if visible:
 		if animation_player:
 			animation_player.play("boss_intro")
 
+#play this sound when the boss intro text fully appears on screen
 func _play_impact_sound():
 	audio_manager.play(impact_sound)

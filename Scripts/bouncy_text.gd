@@ -4,12 +4,16 @@ var base_scale: Vector2
 
 func _ready() -> void:
 	base_scale = scale
+	
+	#set pivot point to center
 	pivot_offset.x = size.x / 2
 	pivot_offset.y = size.y / 2
 
-
+#override setter function for the "text" property
 func _set(property: StringName, value: Variant) -> bool:
 	if property == &"text":
+		
+		#animate text every time this property is changed
 		if text != value:
 			var tween = create_tween()
 			tween.tween_property(self, "scale", base_scale + Vector2.ONE * 0.6, 0.1).from(base_scale)

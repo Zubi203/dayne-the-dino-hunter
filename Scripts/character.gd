@@ -77,6 +77,8 @@ func setup(data: CharacterData):
 	if data == null:
 		return
 	character_data = data
+	
+	#set sprite visuals
 	if sprite:
 		sprite.play(sprite.IDLE_ANIM)
 		sprite.idle_tween_animation()
@@ -87,6 +89,8 @@ func setup(data: CharacterData):
 		sprite.base_scale *= character_data.sprite_scale_multiplier
 		sprite._set_base_attributes()
 	current_health = character_data.max_health
+	
+	#set components if available
 	for child in get_children():
 		if child is EnemyAI:
 			child.setup_ai()
@@ -97,10 +101,13 @@ func take_damage(amount: int):
 	if current_health <= 0:
 		return
 	DamageTaken.emit(self)
+	
+	#apply modifiers to damage number
 	for status in status_effects:
 		if status.status_data is ModifierStatus:
 			amount = status.status_data.apply_modifier(self, amount, ModifierStatus.AffectedStat.INCOMING_DAMAGE)
 	
+	#subtract block from amount of damage to be taken
 	var damage_to_take: int = amount - current_block
 	
 	if current_block > 0:
@@ -109,6 +116,7 @@ func take_damage(amount: int):
 	if damage_to_take <= 0:
 		return
 	
+	#take damage
 	current_health -= damage_to_take
 	
 	audio_manager.play(damage_sound)
@@ -117,23 +125,32 @@ func take_damage(amount: int):
 		sprite.damage_tween_animation(amount)
 
 func take_block_damage(amount: int):
+	
 	current_block -= amount
+	
 	spawn_number_effect(amount, true)
+	
 	audio_manager.play(blocked_damage_sound)
+	
 	sprite._flash_effect(CharacterAnimation.FlashColors.BLUE)
 	if sprite.block_damage_particles:
 		sprite.block_damage_particles.restart()
 
 func attack(target: Character, damage: int):
+	
+	#play attack animation
 	if sprite:
 		sprite.play(sprite.ATTACK_ANIM)
 		if not character_data.is_player:
 			sprite.attack_tween_animation()
+	
+	
 	audio_manager.play(attack_sound)
 	await get_tree().create_timer(attack_delay).timeout
 	if target == null:
 		return
 	
+	#apply modifiers to attack damage
 	for status in status_effects:
 		if status.status_data is ModifierStatus:
 			damage = status.status_data.apply_modifier(self, damage, ModifierStatus.AffectedStat.ATTACK)
@@ -142,50 +159,62 @@ func attack(target: Character, damage: int):
 
 func heal(amount: int):
 	
+	#apply modifiers to healing amount
 	for status in status_effects:
 		if status.status_data is ModifierStatus:
 			amount = status.status_data.apply_modifier(self, amount, ModifierStatus.AffectedStat.HEALING)
 	
 	current_health += amount
+	
 	audio_manager.play(heal_sound)
 	if sprite:
 		sprite.heal_tween_animation(amount)
 
 func block(amount: int):
 	
+	#apply modifiers to block amount
 	for status in status_effects:
 		if status.status_data is ModifierStatus:
 			amount = status.status_data.apply_modifier(self, amount, ModifierStatus.AffectedStat.BLOCK)
 	
 	current_block += amount
+	
 	audio_manager.play(block_sound)
+	
 	if sprite:
 		sprite.block_tween_animation()
 
 func on_turn_end(character: Character):
 	if character == self:
 		
+		#for statuses that update on turn end, update their durations
 		for status in status_effects:
+			
 			status.status_data.on_turn_end(self)
+			
 			if status.status_data.expire_on == StatusEffect.ExpireOn.TURN_END:
 				status.turns_remaining -= 1
 				_update_status_icon_durations(status)
 			await get_tree().create_timer(0.1).timeout
 		
+		#remove all statuses whose remaining duration is zero turns or less
 		remove_expired_statuses()
 	
 	else:
 		
+		#block does not expire if this character has the RetainBlock status effect
 		for effect in status_effects:
 			if effect.status_data is RetainBlockStatus:
 				return
 		
+		#otherwise, reset block to 0
 		current_block = 0
 
 func on_turn_start(character: Character):
 	if not character == self:
 		return
 	
+	#for statuses that update on turn start, update their durations
 	for status in status_effects:
 		status.status_data.on_turn_start(self)
 		if status.status_data.expire_on == StatusEffect.ExpireOn.TURN_START:
@@ -193,6 +222,7 @@ func on_turn_start(character: Character):
 			_update_status_icon_durations(status)
 		await get_tree().create_timer(0.1).timeout
 	
+	#remove all statuses whose remaining duration is zero turns or less
 	remove_expired_statuses()
 
 	

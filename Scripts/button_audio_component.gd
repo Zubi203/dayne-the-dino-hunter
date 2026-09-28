@@ -27,23 +27,18 @@ func play_sound(sound: AudioStream):
 			return
 	stream = sound
 	play.call_deferred()
-
-func play_sound_random_pitch(sound: AudioStream):
-	var base_pitch = pitch_scale
-	pitch_scale = randf_range(base_pitch - pitch_variation, base_pitch + pitch_variation)
-	play_sound(sound)
-	pitch_scale = base_pitch
+	
 
 func _play_mouse_enter_sound():
 	if override_button_enter_sound:
-		play_sound_random_pitch(override_button_enter_sound)
+		play_sound(override_button_enter_sound)
 	else:
 		if default_button_enter_sound:
-			play_sound_random_pitch(default_button_enter_sound)
+			play_sound(default_button_enter_sound)
 
 func _play_press_sound():
 	if override_button_press_sound:
-		play_sound_random_pitch(override_button_press_sound)
+		play_sound(override_button_press_sound)
 	else:
 		if default_button_press_sound:
-			play_sound_random_pitch(default_button_press_sound)
+			play_sound(default_button_press_sound)

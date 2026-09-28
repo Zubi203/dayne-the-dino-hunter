@@ -25,12 +25,14 @@ func setup(card: CardData):
 	if intent_label == null:
 		return
 	
+	#create a cast data sub class instance
 	var data: CardData.CastData = CardData.CastData.new()
 	if game_manager.player:
 		data.opponent = game_manager.player
 	if game_manager.enemy:
 		data.caster = game_manager.enemy
 	
+	#set enemy intent label text
 	intent_label.text = "[b]Enemy Intent: [/b]" + card.get_description(data) 
 
 func _on_mouse_entered() -> void:
@@ -39,9 +41,11 @@ func _on_mouse_entered() -> void:
 	if intent_panel == null:
 		return
 	
+	#set pivot offset for intent panel
 	intent_panel.pivot_offset.y = intent_panel.size.y / 2
 	intent_panel.pivot_offset.x = intent_panel.size.x
 	
+	#play intent label expand animation when mouse is hovered
 	if panel_tween and panel_tween.is_running():
 		panel_tween.kill()
 	panel_tween = create_tween()
@@ -54,9 +58,11 @@ func _on_mouse_exited() -> void:
 	if intent_panel == null:
 		return
 	
+	#set pivot offset for intent panel
 	intent_panel.pivot_offset.y = intent_panel.size.y / 2
 	intent_panel.pivot_offset.x = intent_panel.size.x
 	
+	#minimize intent panel when mouse is not hovered
 	if panel_tween and panel_tween.is_running():
 		panel_tween.kill()
 	panel_tween = create_tween()

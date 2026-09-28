@@ -38,30 +38,38 @@ var intro: RegularIntro:
 
 var card_manager: CardManager:
 	get: return ManagerRegistry.get_manager("card_manager")
+
+#register this script to the Service Locator when it enters the scene tree
 func _enter_tree() -> void:
 	ManagerRegistry.register("game_manager", self)
 
+#remove this script from the service locator as it exits the scene tree
 func _exit_tree() -> void:
 	ManagerRegistry.unregister("game_manager")
+	
+	#save the player's health data to a global Singleton to make it persist between scenes
 	if player:
 		GlobalData.current_health = player.current_health
 		GlobalData.max_health = player.character_data.max_health
 
 func begin_game() -> void:
+	
+	#update ui label
 	EnergyChanged.connect(ui_manager.update_energy_label)
+	
 	spawn_enemy()
 	spawn_player()
 	
+	#display battle start text
 	if enemy != null and enemy.character_data.display_entry_text:
 		await get_tree().create_timer(1.2).timeout
 		intro._animate(enemy.character_data.entry_text + " appears!")
 		await intro.AnimationFinished
 	
+	#if this is a boss room, play boss intro
 	if enemy != null and GlobalData.current_room.type == RoomData.Type.BOSS:
 		ui_manager.activate_boss_intro()
 		await get_tree().create_timer(3.5).timeout
-	
-	
 	
 	next_turn.call_deferred()
 

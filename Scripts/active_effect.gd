@@ -1,3 +1,6 @@
+
+#--------------- Wrapper Resource for tracking status duration --------------
+
 class_name ActiveEffect
 extends RefCounted
 
