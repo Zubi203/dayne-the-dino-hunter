@@ -48,6 +48,10 @@ func set_button_available():
 		_disable_button(false)
 		return
 	
+	if room_data.type == RoomData.Type.BOSS and GlobalData.floors_cleared == map_generator.floors - 1:
+		_disable_button(false)
+		return
+		
 	#if room_data.type == RoomData.Type.BOSS:
 	#	_disable_button(false)
 	#	return
